@@ -13,7 +13,8 @@ ms.author: jianpingxi
 ## Introduction to CPU
 
 Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in top utility output, to the more in-depth statistics reported by ps or sar command, it is possible to accurately determine how much CPU power is being consumed and by what.
-top is the first resource monitoring tool to provide an in-depth representation of CPU utilization. Here is a top report from a 2-processor VM:
+
+The top utility is the first resource monitoring tool to provide an in-depth representation of CPU utilization, it gives you a real-time look at what’s going on with the server. Here is a top report from a 2-processor VM:
 
 ```output
 top - 03:12:38 up  1:53,  3 users,  load average: 1.72, 0.62, 0.25
@@ -42,6 +43,26 @@ MiB Swap:      0.0 total,      0.0 free,      0.0 used.   6838.4 avail Mem
      12 root      20   0       0      0      0 S   0.0   0.0   0:00.00 rcu_tas+
 
 ```
+
+Some things to look for in this view would be the load average (displayed on the right side of the top row), and the value of the following for each CPU:
+
+**us**: This percentage represents the amount of CPU consumed by user processes.
+
+**sy**: This percentage represents the amount of CPU consumed by system processes.
+
+**id**: This percentage represents how idle each CPU is.
+
+**wa**: This percentage represents the percentage of CPU time spent waiting for I/O operations to complete.
+
+**Tasks**
+
+Tasks: This section provides an overview of the total number of processes currently managed by the system.
+
+**total**: Indicates the total count of processes currently being tracked by the system.
+
+**running**: Represents the number of processes currently actively using CPU time.
+
+**zombie**: Indicates processes that have completed execution but still have an entry in the process table.
 
 Now, look at the `dd` processed line from above output:
 
@@ -76,11 +97,15 @@ The followng sections discuss CPU related metrics.
 
 The utilization of a CPU is mainly dependent on which resource is trying to access it. A scheduler exists in the kernel which is responsible for scheduling resources, mainly two and those are threads (single or multi) and interrupts. The scheduler gives different priorities to the different resources. Below list explain the priorities from highest to lowest.
 
-Hardware Interrupts – These are requests created by hardware on the system to process data. This interrupt does this without waiting for current program to finish. It is unconditional and immediate. For example, a key stroke, mouse movement, a NIC may signal that a packet has been received.
-Soft Interrupts – These are kernel software interrupts to do maintenance of the kernel. For example, the kernel clock tick thread is a soft interrupt. On a regular interval it checks and make sure that a process has not passed its allotted time on a processor.
-Real Time Threads – A real time process may come on the CPU and preempt (or “kick off) the kernel..
-Kernel Threads – A kernel thread is a kernel entity, like processes and interrupt handlers; it is the entity handled by the system scheduler. Kernel-level threads are handled by the operating system directly and the thread management is done by the kernel.
-User Threads – This space is often referred to as “user land” and all software applications run in the user space. This space has the lowest priority in the kernel scheduling mechanism. In order to understand how the kernel manages these different resources, we need understand some key concepts such as context switches, run queues, and utilization.
+Hardware Interrupts - These are requests created by hardware on the system to process data. This interrupt does this without waiting for current program to finish. It is unconditional and immediate. For example, a key stroke, mouse movement, a NIC may signal that a packet has been received.
+
+Soft Interrupts - These are kernel software interrupts to do maintenance of the kernel. For example, the kernel clock tick thread is a soft interrupt. On a regular interval it checks and make sure that a process has not passed its allotted time on a processor.
+
+Real Time Threads - A real time process may come on the CPU and preempt (or “kick off) the kernel..
+
+Kernel Threads - A kernel thread is a kernel entity, like processes and interrupt handlers; it is the entity handled by the system scheduler. Kernel-level threads are handled by the operating system directly and the thread management is done by the kernel.
+
+User Threads - This space is often referred to as “user land” and all software applications run in the user space. This space has the lowest priority in the kernel scheduling mechanism. In order to understand how the kernel manages these different resources, we need understand some key concepts such as context switches, run queues, and utilization.
 
 
 vmstat output:
