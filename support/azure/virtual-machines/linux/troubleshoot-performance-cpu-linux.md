@@ -12,10 +12,57 @@ ms.author: jianpingxi
 
 ## Introduction to CPU
 
-Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in top command output, to the more in-depth statistics reported by ps / sar, it is possible to accurately determine how much CPU power is being consumed and by what.
+Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in top utility output, to the more in-depth statistics reported by ps or sar command, it is possible to accurately determine how much CPU power is being consumed and by what.
 top is the first resource monitoring tool to provide an in-depth representation of CPU utilization. Here is a top report from a 2-processor VM:
 
-### Obtain performance pointers
+```output
+top - 03:12:38 up  1:53,  3 users,  load average: 1.72, 0.62, 0.25
+Tasks: 198 total,   1 running, 197 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.3 us,  1.4 sy,  0.0 ni, 15.2 id, 82.5 wa,  0.2 hi,  0.3 si,  0.0 st
+MiB Mem :   7697.8 total,   3672.6 free,    576.6 used,   3448.5 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.   6838.4 avail Mem
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+  17038 root      20   0    8476   2984   1984 D   3.7   0.0   0:00.77 dd
+  17039 root      20   0    8476   2928   1916 D   3.7   0.0   0:01.14 dd
+  16979 root      20   0       0      0      0 D   1.3   0.0   0:00.14 kworker+
+    858 root      20   0 1176440  31088   4580 S   0.7   0.4   0:43.16 auoms
+   1679 omsagent  20   0  350232  68976   9944 S   0.7   0.9   0:18.52 omsagent
+    521 root      20   0       0      0      0 S   0.3   0.0   0:00.05 xfsaild+
+  16018 root      20   0       0      0      0 I   0.3   0.0   0:00.29 kworker+
+  16933 root      20   0   54400   4384   3756 R   0.3   0.1   0:00.21 top
+      1 root      20   0  175948  14356   9180 S   0.0   0.2   0:04.02 systemd
+      2 root      20   0       0      0      0 S   0.0   0.0   0:00.10 kthreadd
+      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp
+      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+
+      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 slub_fl+
+      7 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+     10 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 mm_perc+
+     11 root      20   0       0      0      0 S   0.0   0.0   0:00.00 rcu_tas+
+     12 root      20   0       0      0      0 S   0.0   0.0   0:00.00 rcu_tas+
+
+```
+
+Now, look at the `dd` processed line from above output:
+
+```output
+PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+17038 root      20   0    8476   2984   1984 D   3.7   0.0   0:00.77 dd
+17039 root      20   0    8476   2928   1916 D   3.7   0.0   0:01.14 dd
+```
+
+Meanwhile listing the Top 5 CPU consuming processes:
+```
+[root@rhel8 ~]# ps -eo pcpu,pmem,pid,user,args | sort -r -k1 | head -6
+%CPU %MEM     PID USER     COMMAND
+33.3  0.0   17039 root     dd if=/dev/zero of=/cases/file1.bin bs=1M count=2048 status=progress
+21.0  0.0   17038 root     dd if=/dev/zero of=/cases/file2.bin bs=1M count=2048 status=progress
+ 0.6  0.3     858 root     /opt/microsoft/auoms/bin/auoms
+ 0.3  1.7    1057 root     /opt/microsoft/mdatp/sbin/wdavdaemon
+ 0.3  0.4    2034 root     /usr/libexec/platform-python -u bin/WALinuxAgent-2.11.1.4-py3.9.egg -run-exthandlers
+```
+
+### Obtain CPU metric
 
 You can obtain performance CPU metric using the tools in the following table.
 
@@ -27,43 +74,13 @@ The followng sections discuss CPU related metrics.
 
 ## CPU resource
 
-A certain percentage of CPU is either used or not. Similarly, processes either spend time in CPU (such as 80 percent `usr` usage) or do not (such as 80 percent idle). The main tool to confirm CPU usage is `top`.
+The utilization of a CPU is mainly dependent on which resource is trying to access it. A scheduler exists in the kernel which is responsible for scheduling resources, mainly two and those are threads (single or multi) and interrupts. The scheduler gives different priorities to the different resources. Below list explain the priorities from highest to lowest.
 
-The `top` tool runs in interactive mode by default. It refreshes every second and shows processes as sorted by CPU usage:
-
-```output
-top - 06:33:18 up  4:10,  2 users,  load average: 2.26, 0.83, 0.32
-Tasks: 193 total,   1 running, 192 sleeping,   0 stopped,   0 zombie
-%Cpu(s):  1.2 us,  1.9 sy,  0.0 ni, 16.8 id, 79.7 wa,  0.3 hi,  0.2 si,  0.0 st
-MiB Mem :   7697.8 total,   2597.6 free,    580.2 used,   4519.9 buff/cache
-MiB Swap:      0.0 total,      0.0 free,      0.0 used.   6831.5 avail Mem
-
-    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
-  28459 root      20   0    8476   2860   1844 D   2.7   0.0   0:01.58 dd
-  28460 root      20   0    8476   2984   1984 D   2.7   0.0   0:01.55 dd
-    861 root      20   0 1176588  30280   4524 S   0.7   0.4   1:26.21 auoms
-  22338 root      20   0       0      0      0 D   0.7   0.0   0:00.27 kworker+
-  28422 root      20   0   54400   4276   3652 R   0.7   0.1   0:00.17 top
-    814 root      16  -4  131380   3316   1984 S   0.3   0.0   0:06.97 auditd
-    817 root       0 -20  641596  26824   3656 S   0.3   0.3   0:34.73 auomsco+
-   1073 root      20   0 1139916 135968  57960 S   0.3   1.7   0:48.70 wdavdae+
-   1528 root      20   0 1071884  79200  51168 S   0.3   1.0   0:40.29 wdavdae+
-   1535 omsagent  20   0  342040  66408   9972 S   0.3   0.8   0:43.01 omsagent
-   2005 root      20   0  513792  33172  11812 D   0.3   0.4   0:45.47 platfor+
-  28247 root      20   0       0      0      0 I   0.3   0.0   0:00.37 kworker+
-      1 root      20   0  241300  14192   9060 S   0.0   0.2   0:10.62 systemd
-      2 root      20   0       0      0      0 S   0.0   0.0   0:00.23 kthreadd
-      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp
-      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+
-
-```
-
-Now, look at the `dd` process line from that output:
-
-```output
-PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
-28459 root      20   0    8476   2860   1844 D   2.7   0.0   0:01.58 dd
-```
+Hardware Interrupts – These are requests created by hardware on the system to process data. This interrupt does this without waiting for current program to finish. It is unconditional and immediate. For example, a key stroke, mouse movement, a NIC may signal that a packet has been received.
+Soft Interrupts – These are kernel software interrupts to do maintenance of the kernel. For example, the kernel clock tick thread is a soft interrupt. On a regular interval it checks and make sure that a process has not passed its allotted time on a processor.
+Real Time Threads – A real time process may come on the CPU and preempt (or “kick off) the kernel..
+Kernel Threads – A kernel thread is a kernel entity, like processes and interrupt handlers; it is the entity handled by the system scheduler. Kernel-level threads are handled by the operating system directly and the thread management is done by the kernel.
+User Threads – This space is often referred to as “user land” and all software applications run in the user space. This space has the lowest priority in the kernel scheduling mechanism. In order to understand how the kernel manages these different resources, we need understand some key concepts such as context switches, run queues, and utilization.
 
 
 vmstat output:
@@ -82,18 +99,7 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 
 ```
 
-process state output
-```
-[root@rhel8 ~]# ps -eo pcpu,pmem,pid,user,args | sort -r -k1 | head -6
-%CPU %MEM     PID USER     COMMAND
-25.5  0.0   28984 root     dd if=/dev/zero of=/cases/file1.bin bs=1M count=2048 status=progress
-17.5  0.0   28983 root     dd if=/dev/zero of=/cases/file2.bin bs=1M count=2048 status=progress
- 0.5  0.3     861 root     /opt/microsoft/auoms/bin/auoms
- 0.3  1.7    1073 root     /opt/microsoft/mdatp/sbin/wdavdaemon
- 0.3  0.4    2005 root     /usr/libexec/platform-python -u bin/WALinuxAgent-2.11.1.4-py3.9.egg -run-exthandlers
 
-
-```
 > [!NOTE]
 > - You can display per-CPU usage in the `top` tool by selecting <kbd>1</kbd>.
 >
@@ -103,8 +109,13 @@ Another useful reference is load average. The load average shows an average syst
 
 > [!NOTE]
 > You can quickly obtain the CPU count by running the `nproc` command.
+```
+[root@rhel8 ~]# nproc
+2
+```
+>
 
-In the previous example, the load average is at 1.04. This is a two-CPU system, meaning that there's about 50 percent CPU usage. You can verify this result if you notice the 48.5 percent idle CPU value. (In the `top` command output, the idle CPU value is shown before the `id` label.)
+In the previous example, the load average is at 2.26. This is a two-CPU system, meaning that the system load is approaching full. You can verify this result if you notice the 16.8 percent idle CPU value. (In the `top` command output, the idle CPU value is shown before the `id` label.)
 
 Use the load average as a quick overview of how the system is performing.
 
