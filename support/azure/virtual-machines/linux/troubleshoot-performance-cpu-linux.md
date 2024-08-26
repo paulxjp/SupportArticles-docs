@@ -12,7 +12,7 @@ ms.author: jianpingxi
 
 ## Introduction to CPU
 
-Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in top utility output, to the more in-depth statistics reported by ps or sar command, it is possible to accurately determine how much CPU power is being consumed and by what.
+Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in top utility output, to the more in-depth statistics reported by ps (stands for "process status") or sar (stands for "System Activity Repor") command, it is possible to accurately determine how much CPU power is being consumed and by what.
 
 The top utility is the first resource monitoring tool to provide an in-depth representation of CPU utilization, it gives you a real-time look at what’s going on with the server. Here is a top report from a 2-processor VM:
 
@@ -46,13 +46,8 @@ MiB Swap:      0.0 total,      0.0 free,      0.0 used.   6838.4 avail Mem
 
 Some things to look for in this view would be the load average (displayed on the right side of the top row), and the value of the following for each CPU:
 
-**us**: This percentage represents the amount of CPU consumed by user processes.
-
-**sy**: This percentage represents the amount of CPU consumed by system processes.
-
-**id**: This percentage represents how idle each CPU is.
-
-**wa**: This percentage represents the percentage of CPU time spent waiting for I/O operations to complete.
+**load**: It refers to the number of processes which are either currently being executed by the CPU or are waiting for execution.
+The load average is broken down into three time increments. The first shows the load for the last one minute, the second for the last five minutes, and the final value for the last 15 minutes.
 
 **Tasks**
 
@@ -64,6 +59,14 @@ Tasks: This section provides an overview of the total number of processes curren
 
 **zombie**: Indicates processes that have completed execution but still have an entry in the process table.
 
+**us**: This percentage represents the amount of CPU consumed by user processes.
+
+**sy**: This percentage represents the amount of CPU consumed by system processes.
+
+**id**: This percentage represents how idle each CPU is.
+
+**wa**: This percentage represents the percentage of CPU time spent waiting for I/O operations to complete.
+
 Now, look at the `dd` processed line from above output:
 
 ```output
@@ -71,6 +74,8 @@ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
 17038 root      20   0    8476   2984   1984 D   3.7   0.0   0:00.77 dd
 17039 root      20   0    8476   2928   1916 D   3.7   0.0   0:01.14 dd
 ```
+
+%CPU indicates CPU load percentage of a single core used. You may see this exceeds 100% which means it's occupying a full core plus another (or more).
 
 Meanwhile listing the Top 5 CPU consuming processes:
 ```
