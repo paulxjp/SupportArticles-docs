@@ -145,7 +145,7 @@ Another useful reference is load average. The load average shows an average syst
 ```
 >
 
-In the previous example, the load average is at 2.26. This is a two-CPU system, meaning that the system load is approaching full. You can verify this result if you notice the 16.8 percent idle CPU value. (In the `top` command output, the idle CPU value is shown before the `id` label.)
+In the previous example, the load average is at 1.72. This is a two-CPU system, meaning that the system load is approaching full. You can verify this result if you notice the 15.2 percent idle CPU value. (In the `top` command output, the idle CPU value is shown before the `id` label.)
 
 Use the load average as a quick overview of how the system is performing.
 
