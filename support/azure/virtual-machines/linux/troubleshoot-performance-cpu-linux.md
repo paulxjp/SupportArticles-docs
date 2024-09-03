@@ -150,3 +150,8 @@ In the previous example, the load average is at 1.72. This is a two-CPU system, 
 Use the load average as a quick overview of how the system is performing.
 
 Run the `uptime` command to obtain the load average.
+
+## Q & A scenario
+1) I need RCA (root cause analysis) of a high CPU issue occurring in the past or intermittently, is it possible or what logs we need?
+2) The VM is still going through high CPU usage.
+3) I have identified the high CPU process, is there any way to debug it?
