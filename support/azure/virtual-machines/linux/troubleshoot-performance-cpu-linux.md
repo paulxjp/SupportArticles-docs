@@ -112,8 +112,43 @@ Kernel Threads - A kernel thread is a kernel entity, like processes and interrup
 
 User Threads - This space is often referred to as “user land” and all software applications run in the user space. This space has the lowest priority in the kernel scheduling mechanism. In order to understand how the kernel manages these different resources, we need understand some key concepts such as context switches, run queues, and utilization.
 
+## SAR (System Activity Reporter)
 
-vmstat output:
+How to use SAR (System Activity Reporter) from the sysstat package to Monitor System Performance
+
+https://access.redhat.com/solutions/276533
+
+SAR is provided by the **sysstat** package, which also provides other statistical reporting tools, such as iostat. Note that the sysstat package is not installed by default.
+
+Configure and enable SAR to start on boot with the below commands:
+```
+# systemctl enable sysstat
+# systemctl start sysstat
+```
+
+**How is SAR useful?**
+
+SAR is useful in many ways, both directly and indirectly.
+
+Overall barometer of system performance. When working with a system and not knowing what the "normal" state is, looking at SAR data over the last several production days is useful to establish a baseline of standard activity.
+
+To get a feel for CPU load, load average, memory usage, etc.
+
+By default SAR record statistics every 10 minutes. 
+
+**Basic Usage**
+Print all CPU statistics for today:
+```
+# sar -P ALL
+```
+
+Display CPU utilization statistics from file sa10:
+```
+# sar -u -f /var/log/sa/sa10
+```
+
+
+## vmstat output:
 ```
 [root@rhel8 ~]# vmstat 2
 procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
