@@ -130,11 +130,17 @@ Configure and enable SAR to start on boot with the below commands:
 
 SAR is useful in many ways, both directly and indirectly.
 
-Overall barometer of system performance. When working with a system and not knowing what the "normal" state is, looking at SAR data over the last several production days is useful to establish a baseline of standard activity.
+* Overall barometer of system performance. When working with a system and not knowing what the "normal" state is, looking at SAR data over the last several production days is useful to establish a baseline of standard activity.
 
-To get a feel for CPU load, load average, memory usage, etc.
+* To get a feel for CPU load, load average, memory usage, etc.
 
-By default SAR record statistics every 10 minutes. 
+* Detecting system activity leading up to a crash or hang. Again, you can watch system statistics leading up to a fatal event.
+
+  Did CPU or other resources usage creep up?
+
+  Did the IO-wait climb to 100%?
+
+* By default SAR record statistics every 10 minutes. 
 
 **Basic Usage**
 Print all CPU statistics for today:
@@ -187,6 +193,23 @@ Use the load average as a quick overview of how the system is performing.
 Run the `uptime` command to obtain the load average.
 
 ## Q & A scenario
-1) I need RCA (root cause analysis) of a high CPU issue occurring in the past or intermittently, is it possible or what logs we need?
-2) The VM is still going through high CPU usage.
-3) I have identified the high CPU process, is there any way to debug it?
+* Q: I need RCA (root cause analysis) of a high CPU issue occurring in the past or intermittently, is it possible or what logs we need?
+
+  A: Is sysstat enabled and running? Do we have the sar logs (also included in sosreport output) while issue is occurring?
+   
+* Q: The VM is still going through high CPU usage.
+
+  A: Using the tools mentioned (top, ps, vmstat) to identify the issue.
+
+* Q: I have identified the high CPU process, is there any way to debug it?
+
+  A: The following code obtain the the list of threads and show the stack of each thread of Top 3 High CPU processes:
+  ```
+  for H_PID in $(ps -eo pcpu,pid,ppid,user,args | sort -k1 -r | grep -v PID | head -3 | awk '{print $2}'); do ps -Llp $H_PID; sudo cat /proc/$H_PID/stack; echo; done
+  ```
+
+* Q: The high CPU issue occurs intermittently and keeps very short time every few minutes. We also have the sosreport with sysstat enabled.
+
+  A: The default SAR collection interval is 10 minutes, if the issue is occurring in a very short time, SAR may not reveal the problem because the metric result is aggregated.
+     If the default 10 minute intervals aren't giving the resolution needed, remember that SAR's time interval can be tuned so that is appropriate for the problem.
+  
