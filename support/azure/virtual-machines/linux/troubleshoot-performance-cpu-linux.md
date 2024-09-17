@@ -193,23 +193,32 @@ Use the load average as a quick overview of how the system is performing.
 Run the `uptime` command to obtain the load average.
 
 ## Q & A scenario
-* Q: I need RCA (root cause analysis) of a high CPU issue occurring in the past or intermittently, is it possible or what logs we need?
+<details>
+<summary> Q: I need RCA (root cause analysis) of a high CPU issue occurring in the past or intermittently, is it possible or what logs do we need? </summary>
+<BR>
+A: Is sysstat enabled and running? Do we have the sar logs (also included in sosreport output) while issue is occurring?
 
-  A: Is sysstat enabled and running? Do we have the sar logs (also included in sosreport output) while issue is occurring?
-   
-* Q: The VM is still going through high CPU usage.
+</details>
 
-  A: Using the tools mentioned (top, ps, vmstat) to identify the issue.
+<details>
+<summary> Q: The VM is currently going through high CPU usage. </summary>
+<BR>
+A: Using the tools mentioned (top, ps, vmstat) to identify the issue.
+</details>
 
-* Q: I have identified the high CPU process, is there any way to debug it?
+<details>
+<summary> Q: I have identified the high CPU process, is there any way to debug it? </summary>
+<BR>
+A: The following code obtain the the list of threads and show the stack of each thread of Top 3 High CPU processes:
+    
+```
+   for H_PID in $(ps -eo pcpu,pid,ppid,user,args | sort -k1 -r | grep -v PID | head -3 | awk '{print $2}'); do ps -Llp $H_PID; sudo cat /proc/$H_PID/stack; echo; done
+```
+</details>
 
-  A: The following code obtain the the list of threads and show the stack of each thread of Top 3 High CPU processes:
-  ```
-  for H_PID in $(ps -eo pcpu,pid,ppid,user,args | sort -k1 -r | grep -v PID | head -3 | awk '{print $2}'); do ps -Llp $H_PID; sudo cat /proc/$H_PID/stack; echo; done
-  ```
-
-* Q: The high CPU issue occurs intermittently and keeps very short time every few minutes. We also have the sosreport with sysstat enabled.
-
-  A: The default SAR collection interval is 10 minutes, if the issue is occurring in a very short time, SAR may not reveal the problem because the metric result is aggregated.
-     If the default 10 minute intervals aren't giving the resolution needed, remember that SAR's time interval can be tuned so that is appropriate for the problem.
-  
+<details>
+<summary> Q: The high CPU issue occurs intermittently and keeps very short time every few minutes. We also have the sosreport with sysstat enabled. </summary>
+<BR>
+A: The default SAR collection interval is 10 minutes, if the issue is occurring in a very short time, SAR may not reveal the problem because the metric result is aggregated.
+   If the default 10 minute interval isn't giving the resolution needed, remember that SAR's time interval can be tuned so that is appropriate for the problem.
+</details>
