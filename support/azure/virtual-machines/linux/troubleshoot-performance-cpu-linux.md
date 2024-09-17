@@ -14,6 +14,13 @@ ms.author: jianpingxi
 
 Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in top utility output, to the more in-depth statistics reported by ps (stands for "process status") or sar (stands for "System Activity Repor") command, it is possible to accurately determine how much CPU power is being consumed and by what.
 
+You can obtain performance CPU metric using the tools in the following table.
+
+|Resource|Tool|
+|---|---|
+|CPU|`top`, `vmstat`, `sysstat`, `htop`, `mpstat`, `pidstat`|
+
+## top
 The top utility is the first resource monitoring tool to provide an in-depth representation of CPU utilization, it gives you a real-time look at what’s going on with the server. Here is a top report from a 2-processor VM:
 
 ```output
@@ -48,10 +55,11 @@ Some things to look for in this view would be the load average (displayed on the
 
 **load**: It refers to the number of processes which are either currently being executed by the CPU or are waiting for execution.
 The load average is broken down into three time increments. The first shows the load for the last one minute, the second for the last five minutes, and the final value for the last 15 minutes.
+Use the load average as a quick overview of how the system is performing.
 
 **Tasks**
 
-Tasks: This section provides an overview of the total number of processes currently managed by the system.
+This section provides an overview of the total number of processes currently managed by the system.
 
 **total**: Indicates the total count of processes currently being tracked by the system.
 
@@ -67,6 +75,25 @@ Tasks: This section provides an overview of the total number of processes curren
 
 **wa**: This percentage represents the percentage of CPU time spent waiting for I/O operations to complete.
 
+In the previous example, the load average is at 1.72. This is a two-CPU system, meaning that the system load is approaching full. 
+
+> [!NOTE]
+> You can quickly obtain the CPU count by running the `nproc` command.
+```
+[root@rhel8 ~]# nproc
+2
+```
+>
+
+You can verify this result if you notice the 15.2 percent idle CPU value. (In the `top` command output, the idle CPU value is shown before the `id` label.)
+
+
+> [!NOTE]
+> - You can display per-CPU usage in the `top` tool by selecting <kbd>1</kbd>.
+>
+> - The `top` tool displays a total usage of more than 100 percent if the process is multithreaded and spans more than one CPU.
+>
+
 Now, look at the `dd` processed line from above output:
 
 ```output
@@ -77,7 +104,8 @@ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
 
 %CPU indicates CPU load percentage of a single core used. You may see this exceeds 100% which means it's occupying a full core plus another (or more).
 
-Meanwhile listing the Top 5 CPU consuming processes:
+## ps
+We can list the Top 5 CPU consuming processes:
 ```
 [root@rhel8 ~]# ps -eo pcpu,pmem,pid,user,args | sort -r -k1 | head -6
 %CPU %MEM     PID USER     COMMAND
@@ -88,17 +116,9 @@ Meanwhile listing the Top 5 CPU consuming processes:
  0.3  0.4    2034 root     /usr/libexec/platform-python -u bin/WALinuxAgent-2.11.1.4-py3.9.egg -run-exthandlers
 ```
 
-### Obtain CPU metric
-
-You can obtain performance CPU metric using the tools in the following table.
-
-|Resource|Tool|
-|---|---|
-|CPU|`top`, `vmstat`, `sysstat`, `htop`, `mpstat`, `pidstat`|
-
 The followng sections discuss CPU related metrics.
 
-## CPU resource
+## CPU resource metrics
 
 The utilization of a CPU is mainly dependent on which resource is trying to access it. A scheduler exists in the kernel which is responsible for scheduling resources, mainly two and those are threads (single or multi) and interrupts. The scheduler gives different priorities to the different resources. Below list explain the priorities from highest to lowest.
 
@@ -154,7 +174,25 @@ Display CPU utilization statistics from file sa10:
 ```
 
 
-## vmstat output:
+## vmstat:
+
+vmstat (virtual memory statistics) provides information about block IO and CPU activity in addition to memory.
+
+vmstat will typically be called using two numerical parameters.
+```
+vmstat [delay] [count]
+```
+
+[delay]: specifies the refresh interval in second. 
+
+[count]: specifies the tims of refreshes. 
+
+If you specify only one parameter, it will be taken as the refresh interval, the output will refresh unlimited.
+
+**Outputs**
+
+The first line of the report will contain the average values since the last time the computer was rebooted. All other lines in the report will represent their respective current values. 
+
 ```
 [root@rhel8 ~]# vmstat 2
 procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
@@ -170,27 +208,25 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 
 ```
 
+**Procs**
 
-> [!NOTE]
-> - You can display per-CPU usage in the `top` tool by selecting <kbd>1</kbd>.
->
-> - The `top` tool displays a total usage of more than 100 percent if the process is multithreaded and spans more than one CPU.
+    r: The number of processes waiting for run time.
+    b: The number of processes in uninterruptible sleep.
 
-Another useful reference is load average. The load average shows an average system load in 1-minute, 5-minute, and 15-minute intervals. The value indicates the level of load of the system. Interpreting this value depends on the number of CPUs that are available. For example, if the load average is 2 on a one-CPU system, then the system is so loaded that the processes start to queue up. If there's a load average of 2 on a four-CPU system, there's about 50 percent overall CPU usage.
+**System**
 
-> [!NOTE]
-> You can quickly obtain the CPU count by running the `nproc` command.
-```
-[root@rhel8 ~]# nproc
-2
-```
->
+    in: The number of interrupts per second, including the clock.
+    cs: The number of context switches per second.
 
-In the previous example, the load average is at 1.72. This is a two-CPU system, meaning that the system load is approaching full. You can verify this result if you notice the 15.2 percent idle CPU value. (In the `top` command output, the idle CPU value is shown before the `id` label.)
+**CPU**
 
-Use the load average as a quick overview of how the system is performing.
-
-Run the `uptime` command to obtain the load average.
+    These are percentages of total CPU time.
+    us: Time spent running non-kernel code. (user time, including nice time)
+    sy: Time spent running kernel code. (system time)
+    id: Time spent idle.
+    wa: Time spent waiting for IO.
+    st: Time stolen from a virtual machine.
+    
 
 ## Q & A scenario
 <details>
