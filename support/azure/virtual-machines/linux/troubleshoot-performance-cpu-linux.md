@@ -12,7 +12,7 @@ ms.author: jianpingxi
 
 ## Introduction to CPU
 
-Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in `top` utility output, to the more in-depth statistics reported by `ps` (stands for "process status") or `sar` (stands for "System Activity Repor") command, it is possible to accurately determine how much CPU power is being consumed and by what.
+Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in `top` utility output, to the more in-depth statistics reported by `ps` (stands for "process status") or `sar` (stands for "System Activity Report") command, it is possible to accurately determine how much CPU power is being consumed and by what.
 
 You can obtain performance CPU metric using the tools in the following table.
 
@@ -74,9 +74,11 @@ This section provides an overview of the total number of processes currently man
 
 **id**: This percentage represents how idle each CPU is.
 
-**wa**: This percentage represents the percentage of CPU time spent waiting for I/O operations to complete.
+**wa**: This represents the percentage of CPU time spent waiting for I/O operations to complete.
 
 In the previous example, the load average is at 1.72. This is a two-CPU system, meaning that the system load is approaching full. 
+
+You can verify this result if you notice the 15.2 percent idle CPU value. (In the `top` command output, the idle CPU value is shown before the **id** label.)
 
 > [!NOTE]
 > You can quickly obtain the CPU count by running the `nproc` command.
@@ -86,8 +88,6 @@ In the previous example, the load average is at 1.72. This is a two-CPU system, 
 ```
 >
 
-You can verify this result if you notice the 15.2 percent idle CPU value. (In the `top` command output, the idle CPU value is shown before the `id` label.)
-
 
 > [!NOTE]
 > - You can display per-CPU usage in the `top` tool by selecting <kbd>1</kbd>.
@@ -95,7 +95,8 @@ You can verify this result if you notice the 15.2 percent idle CPU value. (In th
 > - The `top` tool displays a total usage of more than 100 percent if the process is multithreaded and spans more than one CPU.
 >
 
-Now, look at the `dd` processed line from above output:
+
+Now, look at the `dd` process lines from above output:
 
 ```output
 PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
@@ -103,7 +104,7 @@ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
 17039 root      20   0    8476   2928   1916 D   3.7   0.0   0:01.14 dd
 ```
 
-%CPU indicates CPU load percentage of a single core used. You may see this exceeds 100% which means it's occupying a full core plus another (or more).
+**%CPU** indicates CPU load percentage of a single core used. You may see this exceeds 100% which means it's occupying a full core plus another (or more).
 
 The column **'S'** lists the state of the process. Here **"D"** state (TASK_UNINTERRUPTIBLE) is a state which occurs in a kernel code path where the execution can not be interrupted whilst a task is processed. 
 
@@ -125,6 +126,7 @@ Using `ps` to list the Top 5 CPU consuming processes:
  0.3  0.4    2034 root     /usr/libexec/platform-python -u bin/WALinuxAgent-2.11.1.4-py3.9.egg -run-exthandlers
 ```
 
+<br>
 
 The following sections discuss CPU related metrics.
 
@@ -157,6 +159,7 @@ Configure and enable SAR to start on boot with the below commands:
 # systemctl start sysstat
 ```
 
+<br>
 
 **How is SAR useful?**
 
@@ -180,12 +183,12 @@ SAR is useful in many ways, both directly and indirectly.
 
 Print all CPU statistics for today:
 ```
-# sar -P ALL
+# sar -t -P ALL
 ```
 
 Display CPU utilization statistics from file sa10:
 ```
-# sar -u -f /var/log/sa/sa10
+# sar -t -u -f /var/log/sa/sa10
 ```
 
 
@@ -200,9 +203,9 @@ vmstat [delay] [count]
 
 [delay]: specifies the refresh interval in second. 
 
-[count]: specifies the tims of refreshes. 
+[count]: specifies the times of refreshes. 
 
-If you specify only one parameter, it will be taken as the refresh interval, the output will refresh unlimited.
+If you specify only one parameter, it will be taken as the refresh interval, then output will refresh unlimited.
 
 <br>
 
@@ -314,7 +317,7 @@ Linux 4.18.0-553.16.1.el8_10.x86_64 (rhel8)     09/19/2024      _x86_64_       (
 <BR>
 A: Is sysstat enabled and running? Do we have the sar logs (which is also included in sosreport log bundle) while issue is occurring?
    Without sysstat running active, which means there is no baseline we can use for comparison if a performance issue arises, it will be hard to tell how much the performance downgrade during peak usage periods.
-   If you are using 3rd-party monitoring tools, explains how it works because we need convert it to the metrics retrieved from native Linux command tools.
+   If you are using 3rd-party monitoring tools, explains how it works because we need understand and compare it with the metrics retrieved from native Linux command tools.
 
 </details>
 
