@@ -20,6 +20,7 @@ You can obtain performance CPU metric using the tools in the following table.
 |---|---|
 |CPU|`top`, `vmstat`, `sysstat`, `pidstat`, `htop`, `mpstat`|
 
+
 ## top
 The `top` utility is the first resource monitoring tool to provide an in-depth representation of CPU utilization, it gives you a real-time look at what’s going on with the server. Here is a top report from a 2-processor VM:
 
@@ -110,6 +111,8 @@ An example of this might be a low level driver talking to hardware, either retri
 
 In above example it's writing to block disk using dd command.
 
+
+
 ## ps
 Using `ps` to list the Top 5 CPU consuming processes:
 ```
@@ -121,6 +124,7 @@ Using `ps` to list the Top 5 CPU consuming processes:
  0.3  1.7    1057 root     /opt/microsoft/mdatp/sbin/wdavdaemon
  0.3  0.4    2034 root     /usr/libexec/platform-python -u bin/WALinuxAgent-2.11.1.4-py3.9.egg -run-exthandlers
 ```
+
 
 The following sections discuss CPU related metrics.
 
@@ -138,6 +142,7 @@ Kernel Threads - A kernel thread is a kernel entity, like processes and interrup
 
 User Threads - This space is often referred to as “user land” and all software applications run in the user space. This space has the lowest priority in the kernel scheduling mechanism. In order to understand how the kernel manages these different resources, we need understand some key concepts such as context switches, run queues, and utilization.
 
+
 ## SAR (System Activity Reporter)
 
 How to use SAR (System Activity Reporter) from the sysstat package to Monitor System Performance
@@ -151,6 +156,7 @@ Configure and enable SAR to start on boot with the below commands:
 # systemctl enable sysstat
 # systemctl start sysstat
 ```
+
 
 **How is SAR useful?**
 
@@ -167,6 +173,8 @@ SAR is useful in many ways, both directly and indirectly.
   Did the IO-wait climb to 100%?
 
 * By default SAR record statistics every 10 minutes. 
+
+<br>
 
 **Basic Usage**
 
@@ -196,6 +204,8 @@ vmstat [delay] [count]
 
 If you specify only one parameter, it will be taken as the refresh interval, the output will refresh unlimited.
 
+<br>
+
 **vmstat outputs while high I/O activity command dd is running**
 
 The first line of the report will contain the average values since the last time the computer was rebooted. All other lines in the report will represent their respective current values. 
@@ -214,6 +224,9 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  0  3      0 2440972   9500 4836968    0    0     0 108544   91  789  0  2  1 97  0
 
 ```
+
+Meaning of the individual metrics:
+
 
 **Procs**
 
@@ -234,17 +247,27 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
     wa: Time spent waiting for IO.
     st: Time stolen from a virtual machine.
 
+<br>
+
 **How to identify which process is causing high context switches**
 
 The `pidstat` command is used for monitoring individual  tasks  currently being managed by the Linux kernel. 
 
-Run following command to check which process is causing issue. Like vmstat options, it runs 5 times with 2 seconds interval.
+Run following command to check which process is causing issue. Like vmstat option usage, it runs 5 times with 2 seconds interval.
 
 ```
 pidstat -wt 2 5
 ```
 
+**-w**:  Report task switching activity
+
+**-t**:  Display statistics for threads associated with selected tasks.
+
+<br>
+
 Here is an pidstat output while running stess-ng command `stress-ng --cpu 2 --switch 50 --timeout 60s` which purposely generate high CPU context switch:
+
+<br>
 
 **vmstat outputs while high CPU context switch is running**
 ```
@@ -256,6 +279,8 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 103  0      0 5626776  11576 1571916    0    0     0     8   42 200318 15 85  0  0  0
 
 ```
+
+<br>
 
 **pidstat outputs while high CPU context switch is running**
 
@@ -280,6 +305,8 @@ Linux 4.18.0-553.16.1.el8_10.x86_64 (rhel8)     09/19/2024      _x86_64_       (
 06:11:38 AM     0         -     32327    789.05      0.62  |__stress-ng-switc
 
 ```
+
+<br>
 
 ## Q & A scenario
 <details>
