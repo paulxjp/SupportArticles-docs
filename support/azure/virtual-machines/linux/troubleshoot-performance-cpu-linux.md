@@ -113,7 +113,7 @@ In above example it's writing to block disk using dd command.
 ## ps
 Using `ps` to list the Top 5 CPU consuming processes:
 ```
-[root@rhel8 ~]# ps -eo pcpu,pmem,pid,user,args | sort -r -k1 | head -6
+# ps -eo pcpu,pmem,pid,user,args | sort -r -k1 | head -6
 %CPU %MEM     PID USER     COMMAND
 33.3  0.0   17039 root     dd if=/dev/zero of=/cases/file1.bin bs=1M count=2048 status=progress
 21.0  0.0   17038 root     dd if=/dev/zero of=/cases/file2.bin bs=1M count=2048 status=progress
@@ -169,6 +169,7 @@ SAR is useful in many ways, both directly and indirectly.
 * By default SAR record statistics every 10 minutes. 
 
 **Basic Usage**
+
 Print all CPU statistics for today:
 ```
 # sar -P ALL
@@ -195,12 +196,12 @@ vmstat [delay] [count]
 
 If you specify only one parameter, it will be taken as the refresh interval, the output will refresh unlimited.
 
-**Outputs**
+**vmstat outputs while high I/O activity command dd is running**
 
 The first line of the report will contain the average values since the last time the computer was rebooted. All other lines in the report will represent their respective current values. 
 
 ```
-[root@rhel8 ~]# vmstat 2
+# vmstat 2
 procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
  2  3      0 3639696   9500 3634812    0    0    43   326   45  357  2  1 96  1  0
@@ -237,14 +238,48 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 
 The `pidstat` command is used for monitoring individual  tasks  currently being managed by the Linux kernel. 
 
-Run following command to check which process is causing issue.
+Run following command to check which process is causing issue. Like vmstat options, it runs 5 times with 2 seconds interval.
 
 ```
 pidstat -wt 2 5
 ```
 
-Like vmstat option, it runs 5 times with 2 seconds interval.
+Here is an pidstat output while running stess-ng command `stress-ng --cpu 2 --switch 50 --timeout 60s` which purposely generate high CPU context switch:
 
+**vmstat outputs while high CPU context switch is running**
+```
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+107  0      0 5632724  11576 1571512    0    0    41    33   45   33  2  2 96  0  0
+104  0      0 5630920  11576 1571600    0    0     0    52   30 203814 13 87  0  0  0
+104  0      0 5630196  11576 1571700    0    0     0     8   29 203877 12 88  0  0  0
+103  0      0 5626776  11576 1571916    0    0     0     8   42 200318 15 85  0  0  0
+
+```
+
+**pidstat outputs while high CPU context switch is running**
+
+```
+Linux 4.18.0-553.16.1.el8_10.x86_64 (rhel8)     09/19/2024      _x86_64_       (2 CPU)
+
+06:05:09 AM   UID      TGID       TID   cswch/s nvcswch/s  Command
+
+06:11:38 AM     0     32321         -    728.09      0.53  stress-ng-switc
+06:11:38 AM     0         -     32321    728.09      0.53  |__stress-ng-switc
+06:11:38 AM     0     32322         -    853.80      0.62  stress-ng-switc
+06:11:38 AM     0         -     32322    853.80      0.62  |__stress-ng-switc
+06:11:38 AM     0     32323         -    744.08      0.27  stress-ng-switc
+06:11:38 AM     0         -     32323    744.08      0.27  |__stress-ng-switc
+06:11:38 AM     0     32324         -    708.30      0.18  stress-ng-switc
+06:11:38 AM     0         -     32324    708.30      0.18  |__stress-ng-switc
+06:11:38 AM     0     32325         -    804.77      0.27  stress-ng-switc
+06:11:38 AM     0         -     32325    804.77      0.27  |__stress-ng-switc
+06:11:38 AM     0     32326         -    907.16      0.62  stress-ng-switc
+06:11:38 AM     0         -     32326    907.16      0.62  |__stress-ng-switc
+06:11:38 AM     0     32327         -    789.05      0.62  stress-ng-switc
+06:11:38 AM     0         -     32327    789.05      0.62  |__stress-ng-switc
+
+```
 
 ## Q & A scenario
 <details>
