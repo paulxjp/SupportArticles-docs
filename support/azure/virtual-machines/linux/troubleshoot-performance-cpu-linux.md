@@ -104,7 +104,7 @@ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
 
 %CPU indicates CPU load percentage of a single core used. You may see this exceeds 100% which means it's occupying a full core plus another (or more).
 
-The column **'S'** lists the state of the process. Here "D" state (TASK_UNINTERRUPTIBLE) is a state which occurs in a kernel code path where the execution can not be interrupted whilst a task is processed. 
+The column **'S'** lists the state of the process. Here **"D"** state (TASK_UNINTERRUPTIBLE) is a state which occurs in a kernel code path where the execution can not be interrupted whilst a task is processed. 
 
 An example of this might be a low level driver talking to hardware, either retrieving network packet data from NIC or accessing a block of data on a hard disk drive -- read and write I/O.
 
@@ -122,7 +122,7 @@ Using `ps` to list the Top 5 CPU consuming processes:
  0.3  0.4    2034 root     /usr/libexec/platform-python -u bin/WALinuxAgent-2.11.1.4-py3.9.egg -run-exthandlers
 ```
 
-The followng sections discuss CPU related metrics.
+The following sections discuss CPU related metrics.
 
 ## CPU resource metrics
 
@@ -232,7 +232,19 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
     id: Time spent idle.
     wa: Time spent waiting for IO.
     st: Time stolen from a virtual machine.
-    
+
+**How to identify which process is causing high context switches**
+
+The `pidstat` command is used for monitoring individual  tasks  currently being managed by the Linux kernel. 
+
+Run following command to check which process is causing issue.
+
+```
+pidstat -wt 2 5
+```
+
+Like vmstat option, it runs 5 times with 2 seconds interval.
+
 
 ## Q & A scenario
 <details>
