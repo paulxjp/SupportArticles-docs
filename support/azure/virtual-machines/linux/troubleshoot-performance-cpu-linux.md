@@ -236,9 +236,11 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 
 ## Q & A scenario
 <details>
-<summary> Q: I need RCA (root cause analysis) of a high CPU issue occurring in the past or intermittently, is it possible or what logs do we need? </summary>
+<summary> Q: I need root cause of a high CPU issue occurring in the past or intermittently, is it possible or what logs do we need? </summary>
 <BR>
-A: Is sysstat enabled and running? Do we have the sar logs (also included in sosreport output) while issue is occurring?
+A: Is sysstat enabled and running? Do we have the sar logs (which is also included in sosreport log bundle) while issue is occurring?
+   Without sysstat running active, which means there is no baseline we can use for comparison if a performance issue arises, it will be hard to tell how much the performance downgrade during peak usage periods.
+   If you are using 3rd-party monitoring tools, explains how it works because we need convert it to the metrics retrieved from native Linux command tools.
 
 </details>
 
