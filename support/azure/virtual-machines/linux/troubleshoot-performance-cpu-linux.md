@@ -12,16 +12,16 @@ ms.author: jianpingxi
 
 ## Introduction to CPU
 
-Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in top utility output, to the more in-depth statistics reported by ps (stands for "process status") or sar (stands for "System Activity Repor") command, it is possible to accurately determine how much CPU power is being consumed and by what.
+Monitoring CPU utilization is straightforward. From a percentage of CPU utilization in `top` utility output, to the more in-depth statistics reported by `ps` (stands for "process status") or `sar` (stands for "System Activity Repor") command, it is possible to accurately determine how much CPU power is being consumed and by what.
 
 You can obtain performance CPU metric using the tools in the following table.
 
 |Resource|Tool|
 |---|---|
-|CPU|`top`, `vmstat`, `sysstat`, `htop`, `mpstat`, `pidstat`|
+|CPU|`top`, `vmstat`, `sysstat`, `pidstat`, `htop`, `mpstat`|
 
 ## top
-The top utility is the first resource monitoring tool to provide an in-depth representation of CPU utilization, it gives you a real-time look at what’s going on with the server. Here is a top report from a 2-processor VM:
+The `top` utility is the first resource monitoring tool to provide an in-depth representation of CPU utilization, it gives you a real-time look at what’s going on with the server. Here is a top report from a 2-processor VM:
 
 ```output
 top - 03:12:38 up  1:53,  3 users,  load average: 1.72, 0.62, 0.25
@@ -104,8 +104,14 @@ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
 
 %CPU indicates CPU load percentage of a single core used. You may see this exceeds 100% which means it's occupying a full core plus another (or more).
 
+The column **'S'** lists the state of the process. Here "D" state (TASK_UNINTERRUPTIBLE) is a state which occurs in a kernel code path where the execution can not be interrupted whilst a task is processed. 
+
+An example of this might be a low level driver talking to hardware, either retrieving network packet data from NIC or accessing a block of data on a hard disk drive -- read and write I/O.
+
+In above example it's writing to block disk using dd command.
+
 ## ps
-We can list the Top 5 CPU consuming processes:
+Using `ps` to list the Top 5 CPU consuming processes:
 ```
 [root@rhel8 ~]# ps -eo pcpu,pmem,pid,user,args | sort -r -k1 | head -6
 %CPU %MEM     PID USER     COMMAND
@@ -176,7 +182,7 @@ Display CPU utilization statistics from file sa10:
 
 ## vmstat:
 
-vmstat (virtual memory statistics) provides information about block IO and CPU activity in addition to memory.
+`vmstat` (virtual memory statistics) provides information about block IO and CPU activity in addition to memory.
 
 vmstat will typically be called using two numerical parameters.
 ```
