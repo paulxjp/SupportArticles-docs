@@ -22,7 +22,7 @@ You can obtain performance CPU metric using the tools in the following table.
 
 
 ## top
-The `top` utility is the first resource monitoring tool to provide an in-depth representation of CPU utilization, it gives you a real-time look at what’s going on with the server. Here is a top report from a 2-processor VM:
+The `top` utility is the first resource monitoring tool to provide an in-depth representation of CPU utilization. It gives you a real-time look at what’s going on with the server. Here is a top report from a 2-processor virtual machine:
 
 ```output
 top - 03:12:38 up  1:53,  3 users,  load average: 1.72, 0.62, 0.25
@@ -54,7 +54,7 @@ MiB Swap:      0.0 total,      0.0 free,      0.0 used.   6838.4 avail Mem
 
 Some things to look for in this view would be the load average (displayed on the right side of the top row), and the value of the following for each CPU:
 
-**load**: It refers to the number of processes which are either currently being executed by the CPU or are waiting for execution.
+**load**: It refers to the number of processes which are either currently being executed on the CPU or are waiting for execution.
 The load average is broken down into three time increments. The first shows the load for the last one minute, the second for the last five minutes, and the final value for the last 15 minutes.
 Use the load average as a quick overview of how the system is performing.
 
@@ -62,19 +62,19 @@ Use the load average as a quick overview of how the system is performing.
 
 This section provides an overview of the total number of processes currently managed by the system.
 
-**total**: Indicates the total count of processes currently being tracked by the system.
+**total**: total count of processes currently being tracked on the system.
 
-**running**: Represents the number of processes currently actively using CPU time.
+**running**: the number of processes actively using CPU time.
 
-**zombie**: Indicates processes that have completed execution but still have an entry in the process table.
+**zombie**: processes completed execution but still have an entry in the process table.
 
-**us**: This percentage represents the amount of CPU consumed by user processes.
+**us**: percentage represents the amount of CPU consumed by user processes.
 
-**sy**: This percentage represents the amount of CPU consumed by system processes.
+**sy**: percentage represents the amount of CPU consumed by system processes.
 
-**id**: This percentage represents how idle each CPU is.
+**id**: percentage represents how idle each CPU is.
 
-**wa**: This represents the percentage of CPU time spent waiting for I/O operations to complete.
+**wa**: percentage of CPU time spent waiting for I/O operations to complete.
 
 In the previous example, the load average is at 1.72. This is a two-CPU system, meaning that the system load is approaching full. 
 
@@ -108,7 +108,7 @@ PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
 
 The column **'S'** lists the state of the process. Here **"D"** state (TASK_UNINTERRUPTIBLE) is a state which occurs in a kernel code path where the execution can not be interrupted whilst a task is processed. 
 
-An example of this might be a low level driver talking to hardware, either retrieving network packet data from NIC or accessing a block of data on a hard disk drive -- read and write I/O.
+An example of this might be a low level driver talking to hardware, either retrieving network packet data from network interface card or accessing a block of data on a hard disk drive -- read and write I/O.
 
 In above example it's writing to block disk using dd command.
 
